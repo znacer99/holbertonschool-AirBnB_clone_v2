@@ -113,17 +113,43 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
+    def do_create(self, arg):
         """ Create an object of any class"""
-        if not args:
+
+        ArgLine = arg.split(" ")
+
+        # stock command and add () to maque command valid
+        _cls = ArgLine[0]
+        if not ArgLine[0]:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        elif _cls not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
+
+        attributs = {}
+
+        # split name param & value param
+        for key_value in ArgLine[1:]:
+            k, v = key_value.split("=")
+            # replace space by _
+            v = v.replace('_', ' ')
+            attributs[k] = v.strip('"\'')
+
+        # if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+
+        new_instance = HBNBCommand.classes[_cls]()
+        for k, v in attributs.items():
+            new_instance.__dict__[k] = v
+        # #use setattr to update new_instance param
+        # for key, value in attributs.items():
+        #     if isinstance(value, int):
+        #         value = int(value)
+        #         if isinstance(value, str) and '.' in value:
+        #             value = float(value)
+        #     setattr(new_instance, key, value)
         print(new_instance.id)
+        storage.new(new_instance)
         storage.save()
 
     def help_create(self):
