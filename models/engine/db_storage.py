@@ -69,13 +69,19 @@ class DBStorage:
             self.__session.delete(obj)
 
     def reload(self):
-        """Create all tables in the database and initialize a new session."""
+        """ reload the session """
+        from models.base_model import BaseModel, Base
+        from models.amenity import Amenity
+        from models.city import City
+        from models.place import Place
+        from models.review import Review
+        from models.state import State
+        from models.user import User
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
-        Session = scoped_session(session_factory)
-        self.__session = Session()
+        session_factory = sessionmaker(
+            bind=self.__engine, expire_on_commit=False)
+        self._session = scoped_session(session_factory)
 
     def close(self):
-        """Close the working SQLAlchemy session."""
-        self.__session.close()
+        """ self explanatory """
+        self.__session.remove()
